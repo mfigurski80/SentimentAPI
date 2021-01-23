@@ -1,8 +1,6 @@
 package schema
 
 import (
-	"fmt"
-
 	"github.com/graphql-go/graphql"
 )
 
@@ -17,7 +15,7 @@ type Tweet struct {
 	Link       string `json:"link"`
 }
 
-func BuildTweetField() {
+func BuildTweetType() *graphql.Object {
 	var tweetType = graphql.NewObject(
 		graphql.ObjectConfig{
 			Name: "Tweet",
@@ -34,6 +32,5 @@ func BuildTweetField() {
 		},
 	)
 
-	fmt.Println(tweetType)
-	// return graphql.Fields{}
+	return tweetType
 }
