@@ -27,6 +27,7 @@ type Point struct {
 }
 
 type QueryResolverStruct struct {
+	QueryPoint  func(at int) (Point, error)
 	QueryPoints func(from int, to int) ([]Point, error)
 	QueryTweets func(at int) ([]Tweet, error)
 	PointTweets func(Point) ([]Tweet, error)
@@ -71,10 +72,22 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 	queryType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "RootQuery",
 		Fields: graphql.Fields{
-
+			"point": &graphql.Field{
+				Type:        pointType,
+				Description: "Get a specific TimeSeries point",
+				Args: graphql.FieldConfigArgument{
+					"at": &graphql.ArgumentConfig{Type: graphql.Int},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if at, ok := p.Args["at"].(int); ok {
+						return res.QueryPoint(at)
+					}
+					return nil, nil
+				},
+			},
 			"points": &graphql.Field{
 				Type:        graphql.NewList(pointType),
-				Description: "Get TimeSeries points",
+				Description: "Get TimeSeries points between times",
 				Args: graphql.FieldConfigArgument{
 					"from": &graphql.ArgumentConfig{Type: graphql.Int},
 					"to":   &graphql.ArgumentConfig{Type: graphql.Int},
