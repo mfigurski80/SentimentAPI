@@ -28,6 +28,7 @@ type Point struct {
 
 type QueryResolverStruct struct {
 	QueryPoints func(from int, to int) ([]Point, error)
+	QueryTweets func(at int) ([]Tweet, error)
 	PointTweets func(Point) ([]Tweet, error)
 }
 
@@ -46,6 +47,7 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 			"link":       &graphql.Field{Type: graphql.String},
 		},
 	})
+
 	pointType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "point",
 		Fields: graphql.Fields{
@@ -82,6 +84,19 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 						if to, ok := p.Args["to"].(int); ok {
 							return res.QueryPoints(from, to)
 						}
+					}
+					return nil, nil
+				},
+			},
+			"tweets": &graphql.Field{
+				Type:        graphql.NewList(tweetType),
+				Description: "Get Tweets for specific point",
+				Args: graphql.FieldConfigArgument{
+					"at": &graphql.ArgumentConfig{Type: graphql.Int},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if at, ok := p.Args["at"].(int); ok {
+						return res.QueryTweets(at)
 					}
 					return nil, nil
 				},
