@@ -70,7 +70,7 @@ func start() {
 	}
 
 	for results.Next() {
-		var point Point
+		var point types.Point
 
 		err = results.Scan(
 			&point.Time,

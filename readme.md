@@ -7,7 +7,7 @@ This is a graphql API for the twitter sentiment project
 Some development goals
 
 - [ ] Resolvers package
-	- [ ] Resolve Point
+	- [x] Resolve Point
 	- [ ] Resolve Points
 	- [ ] Resolve Tweets
 	- [ ] Resolve Point's Tweets
