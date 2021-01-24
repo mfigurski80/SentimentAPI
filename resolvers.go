@@ -22,11 +22,13 @@ func QueryPointResolver(at int64) (types.Point, error) {
 
 func QueryPointsResolver(from int64, to int64) ([]types.Point, error) {
 	query := fmt.Sprintf("SELECT * FROM TimeSeries WHERE time > \"%s\" AND time <= \"%s\"", client.ParseUnixTime(from), client.ParseUnixTime(to))
+	fmt.Println(query)
 	rows, err := client.Execute(query)
 	if err != nil {
 		return nil, err
 	}
 	points := client.ReadOutPoints(rows)
+	fmt.Println(points)
 	return *points, nil
 }
 

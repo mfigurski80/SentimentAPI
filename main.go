@@ -31,10 +31,10 @@ func main() {
 
 func testSchema(graphSchema *graphql.Schema) {
 
-	query := `
-		{
-			points(from: 45, to: 60) {
+	query := `query TimeSeriesQuery {
+			points(from: 1611410000, to: 1611490000) {
 				time
+				total
 			}
 		}
 	`

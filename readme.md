@@ -6,12 +6,12 @@ This is a graphql API for the twitter sentiment project
 
 Some development goals
 
-- [ ] Resolvers package
+- [x] Resolvers package
 	- [x] Resolve Point
 	- [x] Resolve Points
 	- [x] Resolve Tweets
 	- [x] Resolve Point's Tweets
-	- [ ] Hook up Resolvers to Schema creation
+	- [x] Hook up Resolvers to Schema creation
 - [ ] Set up http server
 - [ ] Comprehensive Caching solution
 	- [ ] Probably make a cache package

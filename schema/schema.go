@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/graphql-go/graphql"
@@ -61,10 +62,10 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 					"at": &graphql.ArgumentConfig{Type: graphql.Int},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if at, ok := p.Args["at"].(int64); ok {
-						return res.QueryPoint(at)
+					if at, ok := p.Args["at"].(int); ok {
+						return res.QueryPoint(int64(at))
 					}
-					return nil, nil
+					return nil, fmt.Errorf("couldn't parse args")
 				},
 			},
 			"points": &graphql.Field{
@@ -75,12 +76,12 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 					"to":   &graphql.ArgumentConfig{Type: graphql.Int},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if from, ok := p.Args["from"].(int64); ok {
-						if to, ok := p.Args["to"].(int64); ok {
-							return res.QueryPoints(from, to)
+					if from, ok := p.Args["from"].(int); ok {
+						if to, ok := p.Args["to"].(int); ok {
+							return res.QueryPoints(int64(from), int64(to))
 						}
 					}
-					return nil, nil
+					return nil, fmt.Errorf("couldn't parse args")
 				},
 			},
 			"tweets": &graphql.Field{
@@ -90,10 +91,10 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 					"at": &graphql.ArgumentConfig{Type: graphql.Int},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if at, ok := p.Args["at"].(int64); ok {
-						return res.QueryTweets(at)
+					if at, ok := p.Args["at"].(int); ok {
+						return res.QueryTweets(int64(at))
 					}
-					return nil, nil
+					return nil, fmt.Errorf("couldn't parse args")
 				},
 			},
 		},
