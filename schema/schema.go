@@ -6,26 +6,7 @@ import (
 	"github.com/graphql-go/graphql"
 )
 
-type Tweet struct {
-	ID         int    `json:"id"`
-	Time       int    `json:"time"`
-	CreatedAt  int    `json:"createdAt"`
-	Sentiment  string `json:"sentiment"`
-	Confidence int    `json:"confidence"`
-	Text       string `json:"text"`
-	Username   string `json:"username"`
-	Link       string `json:"link"`
-}
-
-type Point struct {
-	Time     int     `json:"time"`
-	Positive int     `json:"positive"`
-	Negative int     `json:"negative"`
-	Retweets int     `json:"retweets"`
-	Total    int     `json:"total"`
-	Tweets   []Tweet `json:"tweet"`
-}
-
+// QueryResolverStruct describes all resolvers required to complete schema
 type QueryResolverStruct struct {
 	QueryPoint  func(at int) (Point, error)
 	QueryPoints func(from int, to int) ([]Point, error)
@@ -36,7 +17,7 @@ type QueryResolverStruct struct {
 func BuildSchema(res QueryResolverStruct) graphql.Schema {
 
 	tweetType := graphql.NewObject(graphql.ObjectConfig{
-		Name: "Tweet",
+		Name: "tweet",
 		Fields: graphql.Fields{
 			"id":         &graphql.Field{Type: graphql.Int},
 			"time":       &graphql.Field{Type: graphql.DateTime},
