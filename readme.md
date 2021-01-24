@@ -12,7 +12,7 @@ Some development goals
 	- [x] Resolve Tweets
 	- [x] Resolve Point's Tweets
 	- [x] Hook up Resolvers to Schema creation
-- [ ] Set up http server
+- [x] Set up http server
 - [ ] Comprehensive Caching solution
 	- [ ] Probably make a cache package
 	- [ ] Read and write from point cache in resolvers

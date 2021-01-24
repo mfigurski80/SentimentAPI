@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"net/http"
 
 	"github.com/graphql-go/graphql"
 
@@ -11,8 +12,10 @@ import (
 )
 
 func main() {
-	fmt.Println("starting up api...")
+	setupServer()
+}
 
+func setupServer() {
 	if err := client.Open(); err != nil {
 		panic(err.Error())
 	}
@@ -26,7 +29,18 @@ func main() {
 	}
 
 	graphSchema := schema.BuildSchema(resolvers)
-	testSchema(&graphSchema)
+
+	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+		query := r.URL.Query().Get("query")
+		result := graphql.Do(graphql.Params{
+			Schema:        graphSchema,
+			RequestString: query,
+		})
+		json.NewEncoder(w).Encode(result)
+	})
+
+	fmt.Println("server is running on 0.0.0.0:8080")
+	http.ListenAndServe(":8080", nil)
 }
 
 func testSchema(graphSchema *graphql.Schema) {
