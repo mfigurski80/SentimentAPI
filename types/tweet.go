@@ -1,4 +1,4 @@
-package schema
+package types
 
 type Tweet struct {
 	ID         int    `json:"id"`

@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/mfigurski80/SentimentAPI/types"
 )
 
 var database *sql.DB
@@ -39,16 +40,16 @@ func Execute(query string) (*sql.Rows, error) {
 	return database.Query(query)
 }
 
-func ReadOutPoints(rows *sql.Rows) *[]Point {
-	points := make([]Point, 0)
+func ReadOutPoints(rows *sql.Rows) *[]types.Point {
+	points := make([]types.Point, 0)
 	for rows.Next() {
 		points = append(points, scanPoint(rows))
 	}
 	return &points
 }
 
-func ReadOutTweets(rows *sql.Rows) *[]Tweet {
-	tweets := make([]Tweet, 0)
+func ReadOutTweets(rows *sql.Rows) *[]types.Tweet {
+	tweets := make([]types.Tweet, 0)
 	for rows.Next() {
 		tweets = append(tweets, scanTweet(rows))
 	}

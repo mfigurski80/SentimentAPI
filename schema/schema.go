@@ -4,14 +4,15 @@ import (
 	"log"
 
 	"github.com/graphql-go/graphql"
+	"github.com/mfigurski80/SentimentAPI/types"
 )
 
 // QueryResolverStruct describes all resolvers required to complete schema
 type QueryResolverStruct struct {
-	QueryPoint  func(at int) (Point, error)
-	QueryPoints func(from int, to int) ([]Point, error)
-	QueryTweets func(at int) ([]Tweet, error)
-	PointTweets func(Point) ([]Tweet, error)
+	QueryPoint  func(at int) (types.Point, error)
+	QueryPoints func(from int, to int) ([]types.Point, error)
+	QueryTweets func(at int) ([]types.Tweet, error)
+	PointTweets func(types.Point) ([]types.Tweet, error)
 }
 
 func BuildSchema(res QueryResolverStruct) graphql.Schema {

@@ -4,6 +4,8 @@ import (
 	"database/sql"
 	"fmt"
 	"time"
+
+	"github.com/mfigurski80/SentimentAPI/types"
 )
 
 type dbTweet struct {
@@ -17,27 +19,8 @@ type dbTweet struct {
 	Link       string
 }
 
-type Tweet struct {
-	ID         int
-	Time       int64
-	CreatedAt  int64
-	Sentiment  string
-	Confidence int
-	Text       string
-	Username   string
-	Link       string
-}
-
 type dbPoint struct {
 	Time     []byte
-	Positive int
-	Negative int
-	Retweets int
-	Total    int
-}
-
-type Point struct {
-	Time     int64
 	Positive int
 	Negative int
 	Retweets int
@@ -60,8 +43,8 @@ func ParseUnixTime(unixTime int64) string {
 	)
 }
 
-func makeTweet(t *dbTweet) Tweet {
-	return Tweet{
+func makeTweet(t *dbTweet) types.Tweet {
+	return types.Tweet{
 		ID:         t.ID,
 		Time:       ParseTimeBytes(t.Time),
 		CreatedAt:  ParseTimeBytes(t.CreatedAt),
@@ -73,8 +56,8 @@ func makeTweet(t *dbTweet) Tweet {
 	}
 }
 
-func makePoint(p *dbPoint) Point {
-	return Point{
+func makePoint(p *dbPoint) types.Point {
+	return types.Point{
 		Time:     ParseTimeBytes(p.Time),
 		Positive: p.Positive,
 		Negative: p.Negative,
@@ -83,7 +66,7 @@ func makePoint(p *dbPoint) Point {
 	}
 }
 
-func scanTweet(scanner *sql.Rows) Tweet {
+func scanTweet(scanner *sql.Rows) types.Tweet {
 	var t dbTweet
 	if err := (*scanner).Scan(
 		&t.ID,
@@ -100,7 +83,7 @@ func scanTweet(scanner *sql.Rows) Tweet {
 	return makeTweet(&t)
 }
 
-func scanPoint(scanner *sql.Rows) Point {
+func scanPoint(scanner *sql.Rows) types.Point {
 	var p dbPoint
 	if err := (*scanner).Scan(
 		&p.Time,
