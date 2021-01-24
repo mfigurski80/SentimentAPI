@@ -8,9 +8,9 @@ Some development goals
 
 - [ ] Resolvers package
 	- [x] Resolve Point
-	- [ ] Resolve Points
-	- [ ] Resolve Tweets
-	- [ ] Resolve Point's Tweets
+	- [x] Resolve Points
+	- [x] Resolve Tweets
+	- [x] Resolve Point's Tweets
 	- [ ] Hook up Resolvers to Schema creation
 - [ ] Set up http server
 - [ ] Comprehensive Caching solution
