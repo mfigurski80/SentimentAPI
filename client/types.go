@@ -1,4 +1,4 @@
-package db
+package client
 
 type Tweet struct {
 	ID          int

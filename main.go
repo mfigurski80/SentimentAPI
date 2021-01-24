@@ -3,11 +3,11 @@ package main
 import (
 	"fmt"
 
-	"github.com/mfigurski80/SentimentAPI/db"
+	"github.com/mfigurski80/SentimentAPI/client"
 )
 
 func main() {
-	db.Start()
+	client.Start()
 	fmt.Println("vim-go")
 	// So we want something close to python, where we can define
 	// @resolver('field.subfield')
