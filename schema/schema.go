@@ -9,9 +9,9 @@ import (
 
 // QueryResolverStruct describes all resolvers required to complete schema
 type QueryResolverStruct struct {
-	QueryPoint  func(at int) (types.Point, error)
-	QueryPoints func(from int, to int) ([]types.Point, error)
-	QueryTweets func(at int) ([]types.Tweet, error)
+	QueryPoint  func(at int64) (types.Point, error)
+	QueryPoints func(from int64, to int64) ([]types.Point, error)
+	QueryTweets func(at int64) ([]types.Tweet, error)
 	PointTweets func(types.Point) ([]types.Tweet, error)
 }
 
@@ -42,7 +42,7 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 			"tweets": &graphql.Field{
 				Type: graphql.NewList(tweetType),
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if point, ok := p.Source.(Point); ok {
+					if point, ok := p.Source.(types.Point); ok {
 						return res.PointTweets(point)
 					}
 					return nil, nil
@@ -61,7 +61,7 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 					"at": &graphql.ArgumentConfig{Type: graphql.Int},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if at, ok := p.Args["at"].(int); ok {
+					if at, ok := p.Args["at"].(int64); ok {
 						return res.QueryPoint(at)
 					}
 					return nil, nil
@@ -75,8 +75,8 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 					"to":   &graphql.ArgumentConfig{Type: graphql.Int},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if from, ok := p.Args["from"].(int); ok {
-						if to, ok := p.Args["to"].(int); ok {
+					if from, ok := p.Args["from"].(int64); ok {
+						if to, ok := p.Args["to"].(int64); ok {
 							return res.QueryPoints(from, to)
 						}
 					}
@@ -90,7 +90,7 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 					"at": &graphql.ArgumentConfig{Type: graphql.Int},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if at, ok := p.Args["at"].(int); ok {
+					if at, ok := p.Args["at"].(int64); ok {
 						return res.QueryTweets(at)
 					}
 					return nil, nil
