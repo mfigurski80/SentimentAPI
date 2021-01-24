@@ -4,8 +4,8 @@ import "database/sql"
 
 type Tweet struct {
 	ID         int
-	Time       int
-	CreatedAt  int
+	Time       []byte
+	CreatedAt  []byte
 	Sentiment  string
 	Confidence int
 	Text       string
@@ -14,7 +14,7 @@ type Tweet struct {
 }
 
 type Point struct {
-	Time     []uint8
+	Time     []byte
 	Positive int
 	Negative int
 	Retweets int

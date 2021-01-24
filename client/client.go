@@ -3,20 +3,67 @@ package client
 import (
 	"database/sql"
 	"fmt"
+	"os"
+	"strings"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func Start() {
-	db, err := sql.Open("mysql", "root:password@tcp(localhost:3306)/sentiment")
-	if err != nil {
+var database *sql.DB
+
+func parseConnectionString() string {
+	username := os.Getenv("MYSQL_USERNAME")
+	password := os.Getenv("MYSQL_PASSWORD")
+
+	service := strings.ToUpper(os.Getenv("MYSQL_SERVICE"))
+	service = strings.ReplaceAll(service, "-", "_")
+	host := os.Getenv(service + "_SERVICE_HOST")
+	port := os.Getenv(service + "_SERVICE_PORT")
+
+	return username + ":" + password + "@tcp(" + host + ":" + port + ")/sentiment"
+}
+
+func Open() error {
+	connString := parseConnectionString()
+	fmt.Println("connecting to mysql database at: " + connString)
+	db, err := sql.Open("mysql", connString)
+	database = db
+	return err
+}
+
+func Close() {
+	database.Close()
+}
+
+func Execute(query string) (*sql.Rows, error) {
+	return database.Query(query)
+}
+
+func ReadOutPoints(rows *sql.Rows) *[]Point {
+	points := make([]Point, 0)
+	for rows.Next() {
+		points = append(points, *scanPoint(rows))
+	}
+	return &points
+}
+
+func ReadOutTweets(rows *sql.Rows) *[]Tweet {
+	tweets := make([]Tweet, 0)
+	for rows.Next() {
+		tweets = append(tweets, *scanTweet(rows))
+	}
+	return &tweets
+}
+
+func start() {
+	if err := Open(); err != nil {
 		panic(err.Error())
 	}
-	defer db.Close()
+	defer Close()
 
 	fmt.Println("connected to mysql database")
 
-	results, err := db.Query("SELECT * FROM TimeSeries")
+	results, err := database.Query("SELECT * FROM TimeSeries")
 	if err != nil {
 		panic(err.Error())
 	}

@@ -7,8 +7,22 @@ import (
 )
 
 func main() {
-	client.Start()
-	fmt.Println("vim-go")
+	fmt.Println("starting up api...")
+
+	if err := client.Open(); err != nil {
+		panic(err.Error())
+	}
+
+	rows, err := client.Execute("SELECT * FROM TimeSeries")
+	if err != nil {
+		panic(err.Error())
+	}
+
+	points := client.ReadOutPoints(rows)
+	for _, v := range *points {
+		fmt.Println(v)
+	}
+
 	// So we want something close to python, where we can define
 	// @resolver('field.subfield')
 	// def func():
