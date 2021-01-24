@@ -13,7 +13,7 @@ func main() {
 		panic(err.Error())
 	}
 
-	rows, err := client.Execute("SELECT * FROM TimeSeries")
+	rows, err := client.Execute("SELECT * FROM TimeSeries WHERE time > \"2021-02-24 00:00:00\"")
 	if err != nil {
 		panic(err.Error())
 	}

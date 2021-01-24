@@ -1,9 +1,23 @@
 package main
 
-import "github.com/mfigurski80/SentimentAPI/schema"
+import (
+	"fmt"
 
-func QueryPointResolver(at int) (schema.Point, error) {
-	return schema.Point{}, nil
+	"github.com/mfigurski80/SentimentAPI/client"
+	"github.com/mfigurski80/SentimentAPI/schema"
+)
+
+func QueryPointResolver(at int64) (schema.Point, error) {
+	query := fmt.Sprintf("SELECT * FROM TimeSeries WHERE Time = \"%s\" LIMIT 1", client.ParseUnixTime(at))
+	rows, err := client.Execute(query)
+	if err != nil {
+		return schema.Point{}, err
+	}
+	points := client.ReadOutPoints(rows)
+	if len(*points) <= 0 {
+		return schema.Point{}, nil
+	}
+	return (schema.Point)(*points)[0], nil
 }
 
 func QueryPointsResolver(from int, to int) ([]schema.Point, error) {
