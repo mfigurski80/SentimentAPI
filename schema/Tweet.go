@@ -20,14 +20,14 @@ func BuildTweetType() *graphql.Object {
 		graphql.ObjectConfig{
 			Name: "Tweet",
 			Fields: graphql.Fields{
-				"ID":         &graphql.Field{Type: graphql.Int},
-				"Time":       &graphql.Field{Type: graphql.DateTime},
-				"CreatedAt":  &graphql.Field{Type: graphql.DateTime},
-				"Sentiment":  &graphql.Field{Type: graphql.String},
-				"Confidence": &graphql.Field{Type: graphql.Int},
-				"Text":       &graphql.Field{Type: graphql.String},
-				"Username":   &graphql.Field{Type: graphql.String},
-				"Link":       &graphql.Field{Type: graphql.String},
+				"id":         &graphql.Field{Type: graphql.Int},
+				"time":       &graphql.Field{Type: graphql.DateTime},
+				"createdAt":  &graphql.Field{Type: graphql.DateTime},
+				"sentiment":  &graphql.Field{Type: graphql.String},
+				"confidence": &graphql.Field{Type: graphql.Int},
+				"text":       &graphql.Field{Type: graphql.String},
+				"username":   &graphql.Field{Type: graphql.String},
+				"link":       &graphql.Field{Type: graphql.String},
 			},
 		},
 	)

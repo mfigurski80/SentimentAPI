@@ -1,8 +1,12 @@
 package schema
 
-import "github.com/graphql-go/graphql"
+import (
+	"fmt"
 
-func BuildQueryFields(fn func(graphql.ResolveParams) (interface{}, error)) *graphql.Object {
+	"github.com/graphql-go/graphql"
+)
+
+func BuildQueryFields(pointsResolver func(from int, to int) ([]Point, error)) *graphql.Object {
 	tweetType := BuildTweetType()
 	pointType := BuildPointType(tweetType)
 
@@ -11,10 +15,17 @@ func BuildQueryFields(fn func(graphql.ResolveParams) (interface{}, error)) *grap
 			Type:        graphql.NewList(pointType),
 			Description: "Get TimeSeries points",
 			Args: graphql.FieldConfigArgument{
-				"from": &graphql.ArgumentConfig{Type: graphql.DateTime},
-				"to":   &graphql.ArgumentConfig{Type: graphql.DateTime},
+				"from": &graphql.ArgumentConfig{Type: graphql.Int},
+				"to":   &graphql.ArgumentConfig{Type: graphql.Int},
 			},
-			Resolve: fn,
+			Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+				from, ok1 := p.Args["from"].(int)
+				to, ok2 := p.Args["to"].(int)
+				if !ok1 || !ok2 {
+					return nil, fmt.Errorf("Failed parsing args")
+				}
+				return pointsResolver(from, to)
+			},
 		},
 	}
 

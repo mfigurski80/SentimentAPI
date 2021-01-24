@@ -14,14 +14,14 @@ type Point struct {
 func BuildPointType(tweetType *graphql.Object) *graphql.Object {
 	var pointType = graphql.NewObject(
 		graphql.ObjectConfig{
-			Name: "Point",
+			Name: "point",
 			Fields: graphql.Fields{
-				"Time":     &graphql.Field{Type: graphql.Int},
-				"Positive": &graphql.Field{Type: graphql.Int},
-				"Negative": &graphql.Field{Type: graphql.Int},
-				"Retweets": &graphql.Field{Type: graphql.Int},
-				"Total":    &graphql.Field{Type: graphql.Int},
-				"Tweets":   &graphql.Field{Type: graphql.NewList(tweetType)},
+				"time":     &graphql.Field{Type: graphql.Int},
+				"positive": &graphql.Field{Type: graphql.Int},
+				"negative": &graphql.Field{Type: graphql.Int},
+				"retweets": &graphql.Field{Type: graphql.Int},
+				"total":    &graphql.Field{Type: graphql.Int},
+				"tweets":   &graphql.Field{Type: graphql.NewList(tweetType)},
 			},
 		},
 	)
