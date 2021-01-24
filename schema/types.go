@@ -2,8 +2,8 @@ package schema
 
 type Tweet struct {
 	ID         int    `json:"id"`
-	Time       int    `json:"time"`
-	CreatedAt  int    `json:"createdAt"`
+	Time       int64  `json:"time"`
+	CreatedAt  int64  `json:"createdAt"`
 	Sentiment  string `json:"sentiment"`
 	Confidence int    `json:"confidence"`
 	Text       string `json:"text"`
@@ -12,7 +12,7 @@ type Tweet struct {
 }
 
 type Point struct {
-	Time     uint8   `json:"time"`
+	Time     int64   `json:"time"`
 	Positive int     `json:"positive"`
 	Negative int     `json:"negative"`
 	Retweets int     `json:"retweets"`
