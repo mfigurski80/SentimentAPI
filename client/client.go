@@ -42,7 +42,7 @@ func Execute(query string) (*sql.Rows, error) {
 func ReadOutPoints(rows *sql.Rows) *[]Point {
 	points := make([]Point, 0)
 	for rows.Next() {
-		points = append(points, *scanPoint(rows))
+		points = append(points, scanPoint(rows))
 	}
 	return &points
 }
@@ -50,7 +50,7 @@ func ReadOutPoints(rows *sql.Rows) *[]Point {
 func ReadOutTweets(rows *sql.Rows) *[]Tweet {
 	tweets := make([]Tweet, 0)
 	for rows.Next() {
-		tweets = append(tweets, *scanTweet(rows))
+		tweets = append(tweets, scanTweet(rows))
 	}
 	return &tweets
 }
