@@ -12,7 +12,7 @@ type Tweet struct {
 }
 
 type Point struct {
-	Time     int     `json:"time"`
+	Time     uint8   `json:"time"`
 	Positive int     `json:"positive"`
 	Negative int     `json:"negative"`
 	Retweets int     `json:"retweets"`

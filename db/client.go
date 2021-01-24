@@ -16,12 +16,24 @@ func Start() {
 
 	fmt.Println("connected to mysql database")
 
-	results, err := db.Query("SELECT time FROM TimeSeries")
+	results, err := db.Query("SELECT * FROM TimeSeries")
 	if err != nil {
 		panic(err.Error())
 	}
 
 	for results.Next() {
+		var point Point
 
+		err = results.Scan(
+			&point.Time,
+			&point.Positive,
+			&point.Negative,
+			&point.Retweets,
+			&point.Total,
+		)
+		if err != nil {
+			panic(err.Error())
+		}
+		fmt.Println(point)
 	}
 }
