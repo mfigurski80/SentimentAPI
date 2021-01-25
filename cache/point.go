@@ -34,6 +34,7 @@ func updateCacheForRange(from int64, to int64, cacheUpdateFunc UpdateFuncType) i
 		client.ParseUnixTime(from),
 		client.ParseUnixTime(to),
 	)
+	fmt.Println(query)
 	rows, err := client.Execute(query)
 	if err != nil {
 		panic(err.Error())
@@ -48,6 +49,7 @@ func updateCacheForRange(from int64, to int64, cacheUpdateFunc UpdateFuncType) i
 func getUncachedRange(from int64, to int64) (int64, int64, UpdateFuncType) {
 	// Cache: ------[----------]-----
 	// Range: ---------[--]---------- : Dont query
+	// Range: ------[----------]----- : Dont query
 	// Range: ----[---------]-------- : Query reduced range on left
 	// Range: [--]------------------- : Query increased range on left
 	// Range: [---------------------] : Query everything and replace cache
@@ -57,10 +59,13 @@ func getUncachedRange(from int64, to int64) (int64, int64, UpdateFuncType) {
 	// build new range
 	minCached := PointCache[0].Time
 	maxCached := PointCache[len(PointCache)-1].Time
-	if minCached < from {
+	fmt.Printf("Getting uncached range\n%v - %v  vs:\n%v - %v\n", from, to, minCached, maxCached)
+	if minCached <= from {
+		fmt.Println("left range cached")
 		from = maxCached
 	}
-	if maxCached > to {
+	if maxCached >= to {
+		fmt.Println("right range cached")
 		to = minCached
 	}
 	// figure out update func
