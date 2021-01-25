@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: graphapi
+spec:
+  selector:
+    matchLabels:
+      app: graphapi
+  template:
+    metadata:
+      labels:
+        app: graphapi
+    spec:
+      containers:
+      - name: graphapi
+        image: mfigurski80/tweet-api:ce7c93a
+        ports:
+        - containerPort: 8080
+        env:
+        - name: MYSQL_USERNAME
+          valueFrom:
+            secretKeyRef:
+              name: graphapi-secret
+              key: mysql-user
+        - name: MYSQL_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: graphapi-secret
+              key: mysql-password
+        - name: MYSQL_SERVICE
+          valueFrom:
+            configMapKeyRef:
+              name: graphapi-configmap
+              key: database-url
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: graphapi
+spec:
+  selector:
+    app: graphapi
+  ports:
+  - port: 80
+    targetPort: 8080
