@@ -17,9 +17,9 @@ Some development goals
 Deployment goals
 
 - [x] Makefile and Docker multistage build
-- [ ] Figure out access points
-- [ ] Add all yamls to include this in active cluster
-- [ ] Expose
+- [x] Figure out access points
+- [x] Add all yamls to include this in active cluster
+- [x] Expose
 
 And if this ever blows up:
 
