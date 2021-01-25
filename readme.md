@@ -16,7 +16,7 @@ Some development goals
 
 Deployment goals
 
-- [ ] Makefile and Docker multistage build
+- [x] Makefile and Docker multistage build
 - [ ] Figure out access points
 - [ ] Add all yamls to include this in active cluster
 - [ ] Expose
