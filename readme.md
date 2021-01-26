@@ -21,6 +21,15 @@ Deployment goals
 - [x] Add all yamls to include this in active cluster
 - [x] Expose
 
+Analytics goals
+
+- [x] Dockerfile for supporting analytics mysql database
+	- [ ] Decide on database type (nosql?)
+	- [ ] Figure out how to restrict permissions (is there a way to do write only?)
+- [ ] Mutate graphql points for writing to analytics
+- [ ] Deploy database
+- [ ] Update graphapi in cluster
+
 And if this ever blows up:
 
 - [ ] Cool image-based integration tests?
