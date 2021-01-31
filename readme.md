@@ -24,7 +24,7 @@ Deployment goals
 Analytics goals
 
 - [x] Add identity token to parameters
-- [ ] Add sentiment database in mysql. Transition to new structure
+- [x] Add sentiment database in mysql. Transition to new structure
 - [ ] Add request identity log
 - [ ] Update graphapi in cluster
 

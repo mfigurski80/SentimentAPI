@@ -11,6 +11,7 @@ import (
 )
 
 var database *sql.DB
+var analytics *sql.DB
 
 func parseConnectionString() string {
 	username := os.Getenv("MYSQL_USERNAME")
@@ -21,19 +22,25 @@ func parseConnectionString() string {
 	host := os.Getenv(service + "_SERVICE_HOST")
 	port := os.Getenv(service + "_SERVICE_PORT")
 
-	return username + ":" + password + "@tcp(" + host + ":" + port + ")/sentiment"
+	return username + ":" + password + "@tcp(" + host + ":" + port + ")"
 }
 
 func Open() error {
 	connString := parseConnectionString()
 	fmt.Println("connecting to mysql database at: " + connString)
-	db, err := sql.Open("mysql", connString)
+	db, err := sql.Open("mysql", connString+"/sentiment")
 	database = db
+	if err != nil {
+		return err
+	}
+	db, err = sql.Open("mysql", connString+"/analytics")
+	analytics = db
 	return err
 }
 
 func Close() {
 	database.Close()
+	analytics.Close()
 }
 
 func Execute(query string) (*sql.Rows, error) {
@@ -54,34 +61,4 @@ func ReadOutTweets(rows *sql.Rows) *[]types.Tweet {
 		tweets = append(tweets, scanTweet(rows))
 	}
 	return &tweets
-}
-
-func start() {
-	if err := Open(); err != nil {
-		panic(err.Error())
-	}
-	defer Close()
-
-	fmt.Println("connected to mysql database")
-
-	results, err := database.Query("SELECT * FROM TimeSeries")
-	if err != nil {
-		panic(err.Error())
-	}
-
-	for results.Next() {
-		var point types.Point
-
-		err = results.Scan(
-			&point.Time,
-			&point.Positive,
-			&point.Negative,
-			&point.Retweets,
-			&point.Total,
-		)
-		if err != nil {
-			panic(err.Error())
-		}
-		fmt.Println(point)
-	}
 }

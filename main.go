@@ -31,14 +31,19 @@ func setupServer() {
 	graphSchema := schema.BuildSchema(resolvers)
 
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+		// get url parameters
 		urlParams := r.URL.Query()
+		query := r.URL.Query().Get("query")
 		identity := urlParams.Get("identity")
+
+		// log request to server
 		if identity == "" {
 			w.Write([]byte("{\"data\":null, \"errors\": [{\"message\", \"missing identity parameter\"}]}"))
 			return
 		}
-		// TODO: log identity to mysql
-		query := r.URL.Query().Get("query")
+		client.InsertAnalyticsPing(identity, r.RemoteAddr, query)
+
+		// return graphql result
 		result := graphql.Do(graphql.Params{
 			Schema:        graphSchema,
 			RequestString: query,
