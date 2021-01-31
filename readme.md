@@ -23,17 +23,21 @@ Deployment goals
 
 Analytics goals
 
-- [x] Dockerfile for supporting analytics mysql database
-	- [ ] Decide on database type (nosql?)
-	- [ ] Figure out how to restrict permissions (is there a way to do write only?)
-- [ ] Mutate graphql points for writing to analytics
-- [ ] Deploy database
+- [x] Add identity token to parameters
+- [ ] Add sentiment database in mysql. Transition to new structure
+- [ ] Add request identity log
 - [ ] Update graphapi in cluster
+
+Caching goals:
+
+- [ ] Comprehensive Caching solution
+	- [ ] Put it in client
+	- [ ] Cache points
+	- [ ] Cache tweets
+	- [ ] Potentially cache by sql query?
 
 And if this ever blows up:
 
 - [ ] Cool image-based integration tests?
 - [ ] Unit tests on packages?
-- [ ] Comprehensive Caching solution
-	- [ ] Probably make a cache package
-	- [ ] Read and write from point cache in resolvers
+

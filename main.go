@@ -31,6 +31,13 @@ func setupServer() {
 	graphSchema := schema.BuildSchema(resolvers)
 
 	http.HandleFunc("/graphql", func(w http.ResponseWriter, r *http.Request) {
+		urlParams := r.URL.Query()
+		identity := urlParams.Get("identity")
+		if identity == "" {
+			w.Write([]byte("{\"data\":null, \"errors\": [{\"message\", \"missing identity parameter\"}]}"))
+			return
+		}
+		// TODO: log identity to mysql
 		query := r.URL.Query().Get("query")
 		result := graphql.Do(graphql.Params{
 			Schema:        graphSchema,
