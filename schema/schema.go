@@ -10,12 +10,17 @@ import (
 
 // QueryResolverStruct describes all resolvers required to complete schema
 type QueryResolverStruct struct {
-	QueryPoint  func(at int64) (types.Point, error)
-	QueryPoints func(from int64, to int64) ([]types.Point, error)
-	QueryTweets func(at int64) ([]types.Tweet, error)
+	QueryPoint  func(at int64, token JwtClaims) (types.Point, error)
+	QueryPoints func(from int64, to int64, token JwtClaims) ([]types.Point, error)
+	QueryTweets func(at int64, token JwtClaims) ([]types.Tweet, error)
 	PointTweets func(types.Point) ([]types.Tweet, error)
 }
 
+type getTokenResponse struct {
+	Token string
+}
+
+// BuildSchema constructs graphql schema and attaches all given resolvers
 func BuildSchema(res QueryResolverStruct) graphql.Schema {
 
 	// query
@@ -61,11 +66,18 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 				Type:        pointType,
 				Description: "Get a specific TimeSeries point",
 				Args: graphql.FieldConfigArgument{
-					"at": &graphql.ArgumentConfig{Type: graphql.Int},
+					"at":    &graphql.ArgumentConfig{Type: graphql.Int},
+					"token": &graphql.ArgumentConfig{Type: graphql.String},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if at, ok := p.Args["at"].(int); ok {
-						return res.QueryPoint(int64(at))
+					if token, ok := p.Args["at"].(string); ok {
+						claims, err := ReadJWT(token)
+						if err != nil {
+							return nil, err
+						}
+						if at, ok := p.Args["at"].(int); ok {
+							return res.QueryPoint(int64(at), claims)
+						}
 					}
 					return nil, fmt.Errorf("couldn't parse args")
 				},
@@ -74,13 +86,20 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 				Type:        graphql.NewList(pointType),
 				Description: "Get TimeSeries points between times",
 				Args: graphql.FieldConfigArgument{
-					"from": &graphql.ArgumentConfig{Type: graphql.Int},
-					"to":   &graphql.ArgumentConfig{Type: graphql.Int},
+					"from":  &graphql.ArgumentConfig{Type: graphql.Int},
+					"to":    &graphql.ArgumentConfig{Type: graphql.Int},
+					"token": &graphql.ArgumentConfig{Type: graphql.String},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if from, ok := p.Args["from"].(int); ok {
-						if to, ok := p.Args["to"].(int); ok {
-							return res.QueryPoints(int64(from), int64(to))
+					if token, ok := p.Args["at"].(string); ok {
+						claims, err := ReadJWT(token)
+						if err != nil {
+							return nil, err
+						}
+						if from, ok := p.Args["from"].(int); ok {
+							if to, ok := p.Args["to"].(int); ok {
+								return res.QueryPoints(int64(from), int64(to), claims)
+							}
 						}
 					}
 					return nil, fmt.Errorf("couldn't parse args")
@@ -90,11 +109,18 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 				Type:        graphql.NewList(tweetType),
 				Description: "Get Tweets for specific point",
 				Args: graphql.FieldConfigArgument{
-					"at": &graphql.ArgumentConfig{Type: graphql.Int},
+					"at":    &graphql.ArgumentConfig{Type: graphql.Int},
+					"token": &graphql.ArgumentConfig{Type: graphql.String},
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
-					if at, ok := p.Args["at"].(int); ok {
-						return res.QueryTweets(int64(at))
+					if token, ok := p.Args["at"].(string); ok {
+						claims, err := ReadJWT(token)
+						if err != nil {
+							return nil, err
+						}
+						if at, ok := p.Args["at"].(int); ok {
+							return res.QueryTweets(int64(at), claims)
+						}
 					}
 					return nil, fmt.Errorf("couldn't parse args")
 				},
@@ -121,7 +147,11 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 				},
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if identity, ok := p.Args["identity"].(string); ok {
-						return CreateJWT(identity)
+						token, err := CreateJWT(identity)
+						if err != nil {
+							return nil, err
+						}
+						return getTokenResponse{Token: token}, nil
 					}
 					return nil, fmt.Errorf("couldn't parse args")
 				},
