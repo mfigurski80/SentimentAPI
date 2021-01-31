@@ -18,6 +18,8 @@ type QueryResolverStruct struct {
 
 func BuildSchema(res QueryResolverStruct) graphql.Schema {
 
+	// query
+
 	tweetType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "tweet",
 		Fields: graphql.Fields{
@@ -100,7 +102,34 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 		},
 	})
 
-	schemaConfig := graphql.SchemaConfig{Query: queryType}
+	// mutation
+
+	jwtType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "jwt",
+		Fields: graphql.Fields{
+			"token": &graphql.Field{Type: graphql.String},
+		},
+	})
+
+	mutationType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "RootMutation",
+		Fields: graphql.Fields{
+			"getToken": &graphql.Field{
+				Type: jwtType,
+				Args: graphql.FieldConfigArgument{
+					"identity": &graphql.ArgumentConfig{Type: graphql.NewNonNull(graphql.String)},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if identity, ok := p.Args["identity"].(string); ok {
+						return CreateJWT(identity)
+					}
+					return nil, fmt.Errorf("couldn't parse args")
+				},
+			},
+		},
+	})
+
+	schemaConfig := graphql.SchemaConfig{Query: queryType, Mutation: mutationType}
 	schema, err := graphql.NewSchema(schemaConfig)
 	if err != nil {
 		log.Fatalf("Failed to create graphql schema: %v", err)

@@ -9,14 +9,14 @@ import (
 )
 
 type dbTweet struct {
-	ID         int
-	Time       []byte
-	CreatedAt  []byte
-	Sentiment  string
-	Confidence int
-	Text       string
-	Username   string
-	Link       string
+	ID          int
+	Time        []byte
+	TimePosted  []byte
+	Sentiment   string
+	Confidence  int
+	Text        string
+	Username    string
+	TwitterLink string
 }
 
 type dbPoint struct {
@@ -47,12 +47,12 @@ func makeTweet(t *dbTweet) types.Tweet {
 	return types.Tweet{
 		ID:         t.ID,
 		Time:       ParseTimeBytes(t.Time),
-		CreatedAt:  ParseTimeBytes(t.CreatedAt),
+		CreatedAt:  ParseTimeBytes(t.TimePosted),
 		Sentiment:  t.Sentiment,
 		Confidence: t.Confidence,
 		Text:       t.Text,
 		Username:   t.Username,
-		Link:       t.Link,
+		Link:       t.TwitterLink,
 	}
 }
 
@@ -71,12 +71,12 @@ func scanTweet(scanner *sql.Rows) types.Tweet {
 	if err := (*scanner).Scan(
 		&t.ID,
 		&t.Time,
-		&t.CreatedAt,
+		&t.TimePosted,
 		&t.Sentiment,
 		&t.Confidence,
 		&t.Text,
 		&t.Username,
-		&t.Link,
+		&t.TwitterLink,
 	); err != nil {
 		panic(err.Error())
 	}

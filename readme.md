@@ -23,17 +23,19 @@ Deployment goals
 
 Analytics goals
 
-- [x] Dockerfile for supporting analytics mysql database
-	- [ ] Decide on database type (nosql?)
-	- [ ] Figure out how to restrict permissions (is there a way to do write only?)
+- [ ] Create JWT specification
+	- [ ] Update frontend to match
+- [ ] Create new analytics database. Migrate
 - [ ] Mutate graphql points for writing to analytics
-- [ ] Deploy database
 - [ ] Update graphapi in cluster
+
+Caching goals
+
+- [ ] Comprehensive Caching solution
+	- [ ] Probably make a cache package
+	- [ ] Read and write from point cache in resolvers
 
 And if this ever blows up:
 
 - [ ] Cool image-based integration tests?
 - [ ] Unit tests on packages?
-- [ ] Comprehensive Caching solution
-	- [ ] Probably make a cache package
-	- [ ] Read and write from point cache in resolvers
