@@ -65,7 +65,7 @@ func writeAnalytics(identity string, query string, r *http.Request) {
 	if ip == "" {
 		ip = r.RemoteAddr
 	}
-	if err := client.InsertAnalyticsPing(identity, ip, query); err != nil {
+	if err := client.InsertAnalyticsPing(identity, ip, ""); err != nil {
 		panic(err)
 	}
 }

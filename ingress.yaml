@@ -9,6 +9,10 @@ spec:
   - host: sentiment.mikolaj.space
     http:
       paths:
+        - path: /
+          backend:
+            serviceName: dashboard
+            servicePort: 80
         - path: /graphql
           backend:
             serviceName: graphapi
