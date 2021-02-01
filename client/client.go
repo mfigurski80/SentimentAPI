@@ -22,7 +22,7 @@ func parseConnectionString() string {
 	host := os.Getenv(service + "_SERVICE_HOST")
 	port := os.Getenv(service + "_SERVICE_PORT")
 
-	return username + ":" + password + "@tcp(" + host + ":" + port + ")"
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)", username, password, host, port)
 }
 
 func Open() error {

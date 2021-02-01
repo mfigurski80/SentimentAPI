@@ -36,12 +36,11 @@ func setupServer() {
 		query := r.URL.Query().Get("query")
 		identity := urlParams.Get("identity")
 
-		// log request to server
+		// make sure identity is given
 		if identity == "" {
 			w.Write([]byte("{\"data\":null, \"errors\": [{\"message\", \"missing identity parameter\"}]}"))
 			return
 		}
-		client.InsertAnalyticsPing(identity, r.RemoteAddr, query)
 
 		// return graphql result
 		result := graphql.Do(graphql.Params{
@@ -49,25 +48,24 @@ func setupServer() {
 			RequestString: query,
 		})
 		json.NewEncoder(w).Encode(result)
+
+		// write to analytics
+		writeAnalytics(identity, query, r)
 	})
 
 	fmt.Println("server is running on 0.0.0.0:8080")
 	http.ListenAndServe(":8080", nil)
 }
 
-func testSchema(graphSchema *graphql.Schema) {
-
-	query := `query TimeSeriesQuery {
-			points(from: 1611410000, to: 1611490000) {
-				time
-				total
-			}
-		}
-	`
-
-	params := graphql.Params{Schema: *graphSchema, RequestString: query}
-	r := graphql.Do(params)
-
-	rJSON, _ := json.Marshal(r)
-	fmt.Printf("%s \n", rJSON)
+func writeAnalytics(identity string, query string, r *http.Request) {
+	ip := r.Header.Get("X-Real-Ip")
+	if ip == "" {
+		ip = r.Header.Get("X-Forwarded-For")
+	}
+	if ip == "" {
+		ip = r.RemoteAddr
+	}
+	if err := client.InsertAnalyticsPing(identity, ip, query); err != nil {
+		panic(err)
+	}
 }
