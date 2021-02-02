@@ -17,14 +17,15 @@ var pointCache = struct {
 	index: make(timeMap, 0),
 }
 
-func getRangeFromCache(r *timeRange) *[]types.Point {
+func getPointRangeFromCache(r *timeRange) []types.Point {
 	left, _ := pointCache.index[r.l]
 	right, _ := pointCache.index[r.r]
-	p := make([]types.Point, right-left)
-	for i := range p {
-		p[i] = pointCache.d[i+left]
-	}
-	return &p
+	return pointCache.d[left:right]
+}
+
+func getPointFromCache(t int64) types.Point {
+	i, _ := pointCache.index[t]
+	return pointCache.d[i]
 }
 
 func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheUpdateFunc) {
