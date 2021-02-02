@@ -8,71 +8,6 @@ import (
 
 type timeMap = map[int64]int
 
-type timeRange struct {
-	l int64 // left
-	r int64 // right
-}
-
-func (a *timeRange) contains(t int64) bool {
-	return t >= a.l && t <= a.r
-}
-
-func (a *timeRange) isSubset(b *timeRange) bool {
-	return a.l >= b.l && a.r <= b.r
-}
-
-func (a *timeRange) containedBy(b *timeRange) bool {
-	return a.l > b.l && a.r < b.r
-}
-
-func (a *timeRange) greaterThan(b *timeRange) bool {
-	return a.l > b.r
-}
-
-func (a *timeRange) lessThan(b *timeRange) bool {
-	return a.r < b.l
-}
-
-func (a *timeRange) disjointFrom(b *timeRange) bool {
-	// return a.greaterThan(b) || a.lessThan(b)
-	return a.l > b.r || a.r < b.l
-}
-
-func (a *timeRange) union(b *timeRange) *timeRange {
-	// Note, if a and b are disjoint, gap will be filled
-	return &timeRange{
-		l: min(a.l, b.l),
-		r: max(a.r, b.r),
-	}
-}
-
-func (a *timeRange) diff(b *timeRange) *timeRange {
-	// Note, if b is subset of a, gap will be filled
-	// a.diff(b).union(b) == a
-	if a.isSubset(b) {
-		return &timeRange{}
-	}
-	if b.containedBy(a) || b.disjointFrom(a) {
-		return a
-	}
-	return &timeRange{
-		l: max(a.l, b.r),
-		r: min(a.r, b.l),
-	}
-}
-
-func (a *timeRange) intersect(b *timeRange) *timeRange {
-	// a.intersect(b).subset(a and b)
-	r := &timeRange{
-		l: max(a.l, b.l),
-		r: min(a.r, b.r),
-	}
-	if r.l > r.r {
-		return &timeRange{}
-	}
-	return r
-}
-
 var pointCache = struct {
 	d     []types.Point
 	index timeMap
@@ -96,7 +31,7 @@ func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheU
 		l: pointCache.d[0].Time,
 		r: pointCache.d[len(pointCache.d)-1].Time,
 	}
-	if c.isSubset(r) {
+	if c.subsetOf(r) {
 		return &timeRange{}, r, pointCacheUpdateAll
 	}
 
@@ -105,6 +40,9 @@ func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheU
 	uncached := &timeRange{
 		l: max(r.l, cached.r),
 		r: min(r.r, cached.l),
+	}
+	if uncached.isInvalid() {
+		uncached = makeNullTimeRange()
 	}
 
 	// figure out update function

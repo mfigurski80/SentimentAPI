@@ -3,7 +3,6 @@ package client
 import (
 	"fmt"
 
-	"github.com/mfigurski80/SentimentAPI/client"
 	"github.com/mfigurski80/SentimentAPI/types"
 )
 
@@ -34,11 +33,11 @@ func SelectPoint(at int64) (*types.Point, error) {
 	if err != nil {
 		return nil, err
 	}
-	points := client.ReadOutPoints(rows)
+	points := ReadOutPoints(rows)
 	if len(*points) <= 0 {
 		return &types.Point{}, nil
 	}
-	return points[0], nil
+	return &(*points)[0], nil
 }
 
 func SelectTweets(at int64) (*[]types.Tweet, error) {
