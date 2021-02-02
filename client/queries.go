@@ -35,7 +35,7 @@ func SelectPointsRange(from int64, to int64) (*[]types.Point, error) {
 }
 
 func SelectPoint(at int64) (*types.Point, error) {
-	query := fmt.Sprintf("SELECT * FROM TimeSeries WHERE time = \"%s\" LIMIT 1", ParseUnixTime(RoundUnixTime(at)))
+	query := fmt.Sprintf("SELECT * FROM TimeSeries WHERE time = \"%s\" LIMIT 1", ParseUnixTime(at))
 	rows, err := Execute(query)
 	if err != nil {
 		return nil, err
@@ -48,11 +48,16 @@ func SelectPoint(at int64) (*types.Point, error) {
 }
 
 func SelectTweets(at int64) (*[]types.Tweet, error) {
-	query := fmt.Sprintf("SELECT * FROM Tweets WHERE time = \"%s\"", ParseUnixTime(RoundUnixTime(at)))
-	rows, err := Execute(query)
-	if err != nil {
-		return nil, err
+	tweets, exists := tweetCache.d[at]
+	if !exists {
+		query := fmt.Sprintf("SELECT * FROM Tweets WHERE time = \"%s\"", ParseUnixTime(at))
+		rows, err := Execute(query)
+
+		if err != nil {
+			return nil, err
+		}
+		tweets = ReadOutTweets(rows)
+		tweetCache.d[at] = tweets
 	}
-	tweets := ReadOutTweets(rows)
 	return tweets, nil
 }
