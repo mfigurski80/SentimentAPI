@@ -31,28 +31,40 @@ func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheU
 		l: pointCache.d[0].Time,
 		r: pointCache.d[len(pointCache.d)-1].Time,
 	}
-	if c.subsetOf(r) {
-		return &timeRange{}, r, pointCacheUpdateAll
-	}
+	// if c.containedBy(r) {
+	// return &timeRange{}, r, pointCacheUpdateAll
+	// }
 
 	// build new cached, uncached time ranges
-	cached := r.intersect(c)
-	uncached := &timeRange{
-		l: max(r.l, cached.r),
-		r: min(r.r, cached.l),
+	cached := makeNullTimeRange()
+	uncached := makeNullTimeRange()
+	if r.subsetOf(c) {
+		// base case, request is cached
+		return r, uncached, nil
 	}
-	if uncached.isInvalid() {
-		uncached = makeNullTimeRange()
+	if c.subsetOf(r) {
+		// cache is too small from both ends
+		return cached, r, pointCacheUpdateAll
 	}
-
-	// figure out update function
-	if uncached.greaterThan(cached) {
-		return cached, uncached, pointCacheUpdateRight
-	}
-	if uncached.lessThan(cached) {
+	if r.contains(c.l) {
+		// left is uncached
+		uncached = &timeRange{r.l, c.l - 1}
+		cached = &timeRange{c.l, r.r}
 		return cached, uncached, pointCacheUpdateLeft
 	}
-	return cached, uncached, pointCacheUpdateAll
+	if r.contains(c.r) {
+		// right is uncached
+		uncached = &timeRange{c.r + 1, r.r}
+		cached = &timeRange{r.l, c.r}
+		return cached, uncached, pointCacheUpdateRight
+	}
+	// cache and req are disjoint
+	if r.l > c.r {
+		// req on right
+		return cached, &timeRange{c.r + 1, r.r}, pointCacheUpdateRight
+	}
+	// req on left
+	return cached, &timeRange{r.l, c.l - 1}, pointCacheUpdateLeft
 }
 
 func min(a int64, b int64) int64 {
