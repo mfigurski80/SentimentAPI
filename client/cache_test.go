@@ -10,7 +10,9 @@ func r(l int64, r int64) *timeRange {
 	return &timeRange{l, r}
 }
 
-var cacheTests = []struct {
+// TEST DIVIDE REQUEST RANGE
+
+var divideRequestRangeTests = []struct {
 	testName           string
 	cache              *timeRange
 	requestRange       *timeRange
@@ -29,11 +31,12 @@ var cacheTests = []struct {
 
 func TestDivideRequestRange(t *testing.T) {
 	f := getCachedAndUpdateRanges
-	for i, test := range cacheTests {
+	for i, test := range divideRequestRangeTests {
 		// set up cache
 		pointCache.d = make([]types.Point, test.cache.r-test.cache.l+1)
-		for i := range pointCache.d {
-			pointCache.d[i] = types.Point{Time: test.cache.l + int64(i)}
+		for j := range pointCache.d {
+			pointCache.d[j] = types.Point{Time: test.cache.l + int64(j)}
+			pointCache.index[test.cache.l+int64(j)] = j
 		}
 
 		actualCached, actualUncached, _ := f(test.requestRange)
@@ -48,5 +51,43 @@ func TestDivideRequestRange(t *testing.T) {
 				i, test.testName, test.expectedUncached, actualUncached)
 		}
 
+	}
+}
+
+// TEST GRAB RANGE FROM CACHE
+var getPointRangeTests = []struct {
+	name           string
+	cache          *timeRange
+	request        *timeRange
+	expectedResult *timeRange
+}{
+	{"query from cache", r(0, 10), r(4, 8), r(4, 8)},
+	// {"query 0 range from cache", r(0, 10), r(4, 4), r(0, 0)},
+}
+
+func TestGetPointRange(t *testing.T) {
+	f := getPointRangeFromCache
+	for i, test := range getPointRangeTests {
+		// set up cache
+		pointCache.d = make([]types.Point, test.cache.r-test.cache.l)
+		for j := range pointCache.d {
+			pointCache.d[j] = types.Point{Time: test.cache.l + int64(j)}
+			pointCache.index[test.cache.l+int64(j)] = j
+		}
+
+		// run test
+		actualResult := f(test.request)
+		if len(actualResult) != int(test.expectedResult.r-test.expectedResult.l) {
+			t.Errorf(
+				"[Test #%d - %s]\nexpected result range doesn't match computed (%v != %v)",
+				i, test.name, test.expectedResult, actualResult,
+			)
+		}
+		if actualResult[0].Time != test.expectedResult.l {
+			t.Errorf(
+				"[Test #%d - %s]\nexpected result start doesn't match computer (%v != %v)",
+				i, test.name, test.expectedResult.l, actualResult[0],
+			)
+		}
 	}
 }

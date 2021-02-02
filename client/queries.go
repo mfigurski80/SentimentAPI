@@ -13,18 +13,28 @@ func InsertAnalyticsPing(identity string, ip string, request string) error {
 }
 
 func SelectPointsRange(from int64, to int64) (*[]types.Point, error) {
-	query := fmt.Sprintf(
-		"SELECT * FROM TimeSeries WHERE time > \"%s\" AND time <= \"%s\" ORDER BY time",
-		ParseUnixTime(from),
-		ParseUnixTime(to),
-	)
-	rows, err := Execute(query)
-	if err != nil {
-		return nil, err
-
+	// figure out how to interact with cache
+	pointRange := &timeRange{from, to}
+	_, uncachedRange, updateCache := getCachedAndUpdateRanges(pointRange)
+	if !uncachedRange.isNull() {
+		// get from db
+		fmt.Printf("updating cache for: %v\n", uncachedRange)
+		query := fmt.Sprintf(
+			"SELECT * FROM TimeSeries WHERE time > \"%s\" AND time <= \"%s\" ORDER BY time",
+			ParseUnixTime(uncachedRange.l),
+			ParseUnixTime(uncachedRange.r),
+		)
+		fmt.Println(query)
+		rows, err := Execute(query)
+		if err != nil {
+			fmt.Println(err)
+			return nil, err
+		}
+		updateCache(ReadOutPoints(rows))
+		fmt.Printf("New Cache has size: %d\n", len(pointCache.d))
 	}
-	points := ReadOutPoints(rows)
-	return points, nil
+	points := getPointRangeFromCache(pointRange)
+	return &points, nil
 }
 
 func SelectPoint(at int64) (*types.Point, error) {
