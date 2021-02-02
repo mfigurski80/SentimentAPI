@@ -17,6 +17,16 @@ var pointCache = struct {
 	index: make(timeMap, 0),
 }
 
+func getRangeFromCache(r *timeRange) *[]types.Point {
+	left, _ := pointCache.index[r.l]
+	right, _ := pointCache.index[r.r]
+	p := make([]types.Point, right-left)
+	for i := range p {
+		p[i] = pointCache.d[i+left]
+	}
+	return &p
+}
+
 func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheUpdateFunc) {
 	// Cache: ------[----------]-----
 	// Range: ---------[--]---------- : Dont query
@@ -31,9 +41,6 @@ func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheU
 		l: pointCache.d[0].Time,
 		r: pointCache.d[len(pointCache.d)-1].Time,
 	}
-	// if c.containedBy(r) {
-	// return &timeRange{}, r, pointCacheUpdateAll
-	// }
 
 	// build new cached, uncached time ranges
 	cached := makeNullTimeRange()
@@ -65,19 +72,6 @@ func getCachedAndUpdateRanges(r *timeRange) (*timeRange, *timeRange, pointCacheU
 	}
 	// req on left
 	return cached, &timeRange{r.l, c.l - 1}, pointCacheUpdateLeft
-}
-
-func min(a int64, b int64) int64 {
-	if a > b {
-		return b
-	}
-	return a
-}
-func max(a int64, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
 }
 
 // -- Cache Update Functions --
