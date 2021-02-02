@@ -20,3 +20,10 @@ func ParseUnixTime(unixTime int64) string {
 		t.Hour(), t.Minute(), t.Second(),
 	)
 }
+
+const hour = int64(60 * 60)
+
+func RoundUnixTime(unixTime int64) int64 {
+	// round to nearest hour
+	return unixTime - (unixTime % hour)
+}

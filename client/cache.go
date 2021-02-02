@@ -18,8 +18,14 @@ var pointCache = struct {
 }
 
 func getPointRangeFromCache(r *timeRange) []types.Point {
-	left, _ := pointCache.index[r.l]
-	right, _ := pointCache.index[r.r]
+	left, exists := pointCache.index[r.l]
+	if !exists {
+		left = 0
+	}
+	right, exists := pointCache.index[r.r]
+	if !exists {
+		right = len(pointCache.d)
+	}
 	return pointCache.d[left:right]
 }
 
