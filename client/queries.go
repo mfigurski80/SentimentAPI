@@ -18,12 +18,11 @@ func SelectPointsRange(from int64, to int64) (*[]types.Point, error) {
 	_, uncachedRange, updateCache := getCachedAndUpdateRanges(pointRange)
 	if !uncachedRange.isNull() {
 		// get from db
-		query := fmt.Sprintf(
-			"SELECT * FROM TimeSeries WHERE time > \"%s\" AND time <= \"%s\" ORDER BY time",
+		rows, err := Execute(
+			"SELECT * FROM TimeSeries WHERE time > ? AND time <= ? ORDER BY time",
 			ParseUnixTime(uncachedRange.l),
 			ParseUnixTime(uncachedRange.r),
 		)
-		rows, err := Execute(query)
 		if err != nil {
 			fmt.Println(err)
 			return nil, err
@@ -35,8 +34,10 @@ func SelectPointsRange(from int64, to int64) (*[]types.Point, error) {
 }
 
 func SelectPoint(at int64) (*types.Point, error) {
-	query := fmt.Sprintf("SELECT * FROM TimeSeries WHERE time = \"%s\" LIMIT 1", ParseUnixTime(at))
-	rows, err := Execute(query)
+	rows, err := Execute(
+		"SELECT * FROM TimeSeries WHERE time = ? LIMIT 1",
+		ParseUnixTime(at),
+	)
 	if err != nil {
 		return nil, err
 	}
@@ -50,9 +51,10 @@ func SelectPoint(at int64) (*types.Point, error) {
 func SelectTweets(at int64) (*[]types.Tweet, error) {
 	tweets, exists := tweetCache.d[at]
 	if !exists {
-		query := fmt.Sprintf("SELECT * FROM Tweets WHERE time = \"%s\"", ParseUnixTime(at))
-		rows, err := Execute(query)
-
+		rows, err := Execute(
+			"SELECT * FROM Tweets WHERE time = ?",
+			ParseUnixTime(at),
+		)
 		if err != nil {
 			return nil, err
 		}

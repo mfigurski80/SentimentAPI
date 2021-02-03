@@ -43,8 +43,8 @@ func Close() {
 	analytics.Close()
 }
 
-func Execute(query string) (*sql.Rows, error) {
-	return database.Query(query)
+func Execute(query string, args ...interface{}) (*sql.Rows, error) {
+	return database.Query(query, args...)
 }
 
 func ReadOutPoints(rows *sql.Rows) *[]types.Point {
