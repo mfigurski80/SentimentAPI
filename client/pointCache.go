@@ -20,7 +20,6 @@ var pointCache = struct {
 
 func getPointRangeFromCache(r *timeRange) []types.Point {
 	left, exists := pointCache.index[r.l]
-	left += 1
 	if !exists {
 		left = 0
 		fmt.Printf("Cache is missing on left (%v vs existing left %v)", r.l, pointCache.d[0].Time)
@@ -29,7 +28,7 @@ func getPointRangeFromCache(r *timeRange) []types.Point {
 	right += 1
 	if !exists || right > len(pointCache.d) {
 		right = len(pointCache.d)
-		fmt.Printf("Cache is missing on right (%v vs existing right %v)", r.r, pointCache.d[right].Time)
+		fmt.Printf("Cache is missing on right (%v vs existing right %v)", r.r, pointCache.d[right-1].Time)
 	}
 	return pointCache.d[left:right]
 }
