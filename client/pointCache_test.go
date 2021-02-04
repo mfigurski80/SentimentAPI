@@ -79,13 +79,13 @@ func TestGetPointRange(t *testing.T) {
 
 		// run test
 		actualResult := f(test.request)
-		if len(actualResult) != int(test.expectedResult.r-test.expectedResult.l+1) {
+		if len(actualResult) != int(test.expectedResult.r-test.expectedResult.l) {
 			t.Errorf(
 				"[Test #%d - %s]\nexpected result range doesn't match computed (%v != %v)",
 				i, test.name, test.expectedResult, actualResult,
 			)
 		}
-		if actualResult[0].Time != test.expectedResult.l {
+		if actualResult[0].Time != test.expectedResult.l+1 {
 			t.Errorf(
 				"[Test #%d - %s]\nexpected result start doesn't match computed (%v != %v)",
 				i, test.name, test.expectedResult.l, actualResult[0],

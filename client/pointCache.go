@@ -1,6 +1,7 @@
 package client
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/mfigurski80/SentimentAPI/types"
@@ -19,13 +20,16 @@ var pointCache = struct {
 
 func getPointRangeFromCache(r *timeRange) []types.Point {
 	left, exists := pointCache.index[r.l]
+	left += 1
 	if !exists {
 		left = 0
+		fmt.Printf("Cache is missing on left (%v vs existing left %v)", r.l, pointCache.d[0].Time)
 	}
 	right, exists := pointCache.index[r.r]
 	right += 1
 	if !exists || right > len(pointCache.d) {
 		right = len(pointCache.d)
+		fmt.Printf("Cache is missing on right (%v vs existing right %v)", r.r, pointCache.d[right].Time)
 	}
 	return pointCache.d[left:right]
 }
