@@ -23,7 +23,8 @@ func getPointRangeFromCache(r *timeRange) []types.Point {
 		left = 0
 	}
 	right, exists := pointCache.index[r.r]
-	if !exists {
+	right += 1
+	if !exists || right > len(pointCache.d) {
 		right = len(pointCache.d)
 	}
 	return pointCache.d[left:right]

@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: graphapi
-        image: mfigurski80/tweet-api:1ff1dcc
+        image: mfigurski80/tweet-api:510869f
         ports:
         - containerPort: 8080
         env:

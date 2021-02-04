@@ -30,6 +30,7 @@ func SelectPointsRange(from int64, to int64) (*[]types.Point, error) {
 		updateCache(ReadOutPoints(rows))
 	}
 	points := getPointRangeFromCache(pointRange)
+	fmt.Printf("Getting point range from %v to %v resulted in %d results\n", from, to, len(points))
 	return &points, nil
 }
 

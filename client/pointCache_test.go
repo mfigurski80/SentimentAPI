@@ -62,6 +62,8 @@ var getPointRangeTests = []struct {
 	expectedResult *timeRange
 }{
 	{"query from cache", r(0, 10), r(4, 8), r(4, 8)},
+	{"query up to right", r(0, 10), r(5, 10), r(5, 10)},
+	{"query up to left", r(0, 10), r(0, 5), r(0, 5)},
 	// {"query 0 range from cache", r(0, 10), r(4, 4), r(0, 0)},
 }
 
@@ -69,7 +71,7 @@ func TestGetPointRange(t *testing.T) {
 	f := getPointRangeFromCache
 	for i, test := range getPointRangeTests {
 		// set up cache
-		pointCache.d = make([]types.Point, test.cache.r-test.cache.l)
+		pointCache.d = make([]types.Point, test.cache.r-test.cache.l+1)
 		for j := range pointCache.d {
 			pointCache.d[j] = types.Point{Time: test.cache.l + int64(j)}
 			pointCache.index[test.cache.l+int64(j)] = j
@@ -77,7 +79,7 @@ func TestGetPointRange(t *testing.T) {
 
 		// run test
 		actualResult := f(test.request)
-		if len(actualResult) != int(test.expectedResult.r-test.expectedResult.l) {
+		if len(actualResult) != int(test.expectedResult.r-test.expectedResult.l+1) {
 			t.Errorf(
 				"[Test #%d - %s]\nexpected result range doesn't match computed (%v != %v)",
 				i, test.name, test.expectedResult, actualResult,
@@ -85,8 +87,16 @@ func TestGetPointRange(t *testing.T) {
 		}
 		if actualResult[0].Time != test.expectedResult.l {
 			t.Errorf(
-				"[Test #%d - %s]\nexpected result start doesn't match computer (%v != %v)",
+				"[Test #%d - %s]\nexpected result start doesn't match computed (%v != %v)",
 				i, test.name, test.expectedResult.l, actualResult[0],
+			)
+		}
+
+		last := actualResult[len(actualResult)-1]
+		if last.Time != test.expectedResult.r {
+			t.Errorf(
+				"[Test #%d - %s]\nexpected result end doesn't match computed (%v != %v)",
+				i, test.name, test.expectedResult.r, last,
 			)
 		}
 	}
