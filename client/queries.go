@@ -12,6 +12,31 @@ func InsertAnalyticsPing(identity string, ip string, request string) error {
 	return err
 }
 
+func InsertSubscription(email string, identity string) error {
+	tx, err := analytics.Begin()
+	if err != nil {
+		return err
+	}
+	stmt, err := tx.Prepare("INSERT INTO Subscriptions (email, identity) VALUES (?, ?)")
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	_, err = stmt.Exec(email, identity)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	err = tx.Commit()
+	if err != nil {
+		stmt.Close()
+		tx.Rollback()
+		return err
+	}
+	stmt.Close()
+	return nil
+}
+
 func SelectPointsRange(from int64, to int64) (*[]types.Point, error) {
 	// figure out how to interact with cache
 	pointRange := &timeRange{RoundUnixTime(from), RoundUnixTime(to)}
