@@ -25,16 +25,22 @@ Analytics goals
 
 - [x] Add identity token to parameters
 - [x] Add sentiment database in mysql. Transition to new structure
-- [ ] Add request identity log
-- [ ] Update graphapi in cluster
+- [x] Add request identity log
+- [x] Update graphapi in cluster
 
 Caching goals:
 
-- [ ] Comprehensive Caching solution
-	- [ ] Put it in client
-	- [ ] Cache points
-	- [ ] Cache tweets
-	- [ ] Potentially cache by sql query?
+- [x] Comprehensive Caching solution
+	- [x] Put it in client
+	- [x] Cache points
+	- [x] Cache tweets
+
+Subscriptions:
+
+- [ ] Add subscription mutation
+- [ ] Add resolver
+- [ ] Add client query
+- [ ] Deploy
 
 And if this ever blows up:
 
