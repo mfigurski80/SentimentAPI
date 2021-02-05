@@ -99,9 +99,10 @@ func pointCacheUpdateLeft(p *[]types.Point) {
 
 func pointCacheUpdateRight(p *[]types.Point) {
 	pointCache.Lock()
+	startIndex := len(pointCache.d)
 	pointCache.d = append(pointCache.d, *p...)
 	for i, v := range *p {
-		pointCache.index[v.Time] = i
+		pointCache.index[v.Time] = startIndex + i
 	}
 	pointCache.Unlock()
 }
