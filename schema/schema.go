@@ -10,13 +10,16 @@ import (
 
 // QueryResolverStruct describes all resolvers required to complete schema
 type QueryResolverStruct struct {
-	QueryPoint  func(at int64) (types.Point, error)
-	QueryPoints func(from int64, to int64) ([]types.Point, error)
-	QueryTweets func(at int64) ([]types.Tweet, error)
-	PointTweets func(types.Point) ([]types.Tweet, error)
+	QueryPoint         func(at int64) (types.Point, error)
+	QueryPoints        func(from int64, to int64) ([]types.Point, error)
+	QueryTweets        func(at int64) ([]types.Tweet, error)
+	PointTweets        func(types.Point) ([]types.Tweet, error)
+	MutateSubscription func(email string, identity string) error
 }
 
 func BuildSchema(res QueryResolverStruct) graphql.Schema {
+
+	// Query resolvers
 
 	tweetType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "tweet",
@@ -100,7 +103,29 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 		},
 	})
 
-	schemaConfig := graphql.SchemaConfig{Query: queryType}
+	// Mutation Resolvers
+
+	mutationType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "RootMutation",
+		Fields: graphql.Fields{
+			"subscription": &graphql.Field{
+				Args: graphql.FieldConfigArgument{
+					"email":    &graphql.ArgumentConfig{Type: graphql.String},
+					"identity": &graphql.ArgumentConfig{Type: graphql.String},
+				},
+				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
+					if email, ok := p.Args["email"].(string); ok {
+						if identity, ok := p.Args["identity"].(string); ok {
+							return nil, res.MutateSubscription(email, identity)
+						}
+					}
+					return nil, fmt.Errorf("couldn't parse args")
+				},
+			},
+		},
+	})
+
+	schemaConfig := graphql.SchemaConfig{Query: queryType, Mutation: mutationType}
 	schema, err := graphql.NewSchema(schemaConfig)
 	if err != nil {
 		log.Fatalf("Failed to create graphql schema: %v", err)

@@ -22,10 +22,11 @@ func setupServer() {
 	defer client.Close()
 
 	resolvers := schema.QueryResolverStruct{
-		QueryPoint:  QueryPointResolver,
-		QueryPoints: QueryPointsResolver,
-		QueryTweets: QueryTweetsResolver,
-		PointTweets: PointTweetsResolver,
+		QueryPoint:         QueryPointResolver,
+		QueryPoints:        QueryPointsResolver,
+		QueryTweets:        QueryTweetsResolver,
+		PointTweets:        PointTweetsResolver,
+		MutateSubscription: MutateSubscription,
 	}
 
 	graphSchema := schema.BuildSchema(resolvers)

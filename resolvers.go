@@ -23,3 +23,7 @@ func QueryTweetsResolver(at int64) ([]types.Tweet, error) {
 func PointTweetsResolver(p types.Point) ([]types.Tweet, error) {
 	return QueryTweetsResolver(p.Time)
 }
+
+func MutateSubscription(email string, identity string) error {
+	return nil
+}
