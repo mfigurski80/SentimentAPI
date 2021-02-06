@@ -24,6 +24,6 @@ func PointTweetsResolver(p types.Point) ([]types.Tweet, error) {
 	return QueryTweetsResolver(p.Time)
 }
 
-func MutateSubscription(email string, identity string) error {
-	return nil
+func MutateSubscription(s types.Subscription) (types.Subscription, error) {
+	return s, client.InsertSubscription(s.Email, s.Identity)
 }

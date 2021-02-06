@@ -14,7 +14,7 @@ type QueryResolverStruct struct {
 	QueryPoints        func(from int64, to int64) ([]types.Point, error)
 	QueryTweets        func(at int64) ([]types.Tweet, error)
 	PointTweets        func(types.Point) ([]types.Tweet, error)
-	MutateSubscription func(email string, identity string) error
+	MutateSubscription func(types.Subscription) (types.Subscription, error)
 }
 
 func BuildSchema(res QueryResolverStruct) graphql.Schema {
@@ -105,10 +105,19 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 
 	// Mutation Resolvers
 
+	subscriptionType := graphql.NewObject(graphql.ObjectConfig{
+		Name: "subscription",
+		Fields: graphql.Fields{
+			"email":    &graphql.Field{Type: graphql.String},
+			"identity": &graphql.Field{Type: graphql.String},
+		},
+	})
+
 	mutationType := graphql.NewObject(graphql.ObjectConfig{
 		Name: "RootMutation",
 		Fields: graphql.Fields{
 			"subscription": &graphql.Field{
+				Type: subscriptionType,
 				Args: graphql.FieldConfigArgument{
 					"email":    &graphql.ArgumentConfig{Type: graphql.String},
 					"identity": &graphql.ArgumentConfig{Type: graphql.String},
@@ -116,7 +125,7 @@ func BuildSchema(res QueryResolverStruct) graphql.Schema {
 				Resolve: func(p graphql.ResolveParams) (interface{}, error) {
 					if email, ok := p.Args["email"].(string); ok {
 						if identity, ok := p.Args["identity"].(string); ok {
-							return nil, res.MutateSubscription(email, identity)
+							return res.MutateSubscription(types.Subscription{Email: email, Identity: identity})
 						}
 					}
 					return nil, fmt.Errorf("couldn't parse args")

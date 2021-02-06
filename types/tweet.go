@@ -19,3 +19,8 @@ type Point struct {
 	Total    int     `json:"total"`
 	Tweets   []Tweet `json:"tweet"`
 }
+
+type Subscription struct {
+	Email    string `json:"email"`
+	Identity string `json:"identity"`
+}
